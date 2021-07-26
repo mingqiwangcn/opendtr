@@ -1,21 +1,28 @@
 import json
+import os
 from tqdm import tqdm
+import numpy as np
 import random
 from multiprocessing import Pool as ProcessPool
-import numpy as np
 
 MAX_ENTITY_SIZE = 50
 MAX_COL_SIZE = 20
 MAX_TUPLE_SIZE = 123
 MAX_GRAPH_SIZE = 150
 
-def read_tables():
-    table_lst = []
-    data_file = '/home/cc/data/nq/tables/tables.json'
+def read_table_file(table_lst, data_file):
     with open(data_file) as f:
         for line in tqdm(f):
-            table = json.loads(line)
+            data = json.loads(line)
+            table = data['table']
             table_lst.append(table)
+    return table_lst
+
+def read_tables():
+    table_lst = []
+    read_table_file(table_lst, '/home/cc/data/nq/interactions/train.json')
+    read_table_file(table_lst, '/home/cc/data/nq/interactions/dev.json')
+    read_table_file(table_lst, '/home/cc/data/nq/interactions/test.json')
     return table_lst
 
 def process_table(table):
@@ -46,30 +53,58 @@ def process_table(table):
             row_info.append(cell_info)
         graph_lst = gen_graph(row_info, table['documentUrl'])
         table_graph_lst.extend(graph_lst)
-    return table_graph_lst
+    return (table, table_graph_lst)
     
 def main():
     out_file_src = './output/test_unseen.source'
     out_file_tar = './output/test_unseen.target'
     f_o_src = open(out_file_src, 'w')
     f_o_tar = open(out_file_tar, 'w')
+    out_table_file = os.path.join('output', 'right_tables.json')
+    f_o_tables = open(out_table_file, 'w')
 
     table_lst = read_tables()
     N = len(table_lst)
     work_pool = ProcessPool()
-   
-    for graph_lst in tqdm(work_pool.imap_unordered(process_table, table_lst), total=N):
+    
+    table_id_dict = {}
+    row = 0
+    for graph_info in tqdm(work_pool.imap_unordered(process_table, table_lst), total=N):
+        table = graph_info[0]
+        table_id = table['tableId']
+        if table_id not in table_id_dict:
+            table_id_dict[table_id] = {'start_row':None, 'end_row':None}
+        else:
+            continue
+        f_o_tables.write(json.dumps(table) + '\n')
+
+        graph_lst = graph_info[1]
+        row_info = table_id_dict[table_id]
+        row_info['start_row'] = row 
         for graph in graph_lst:
+            row += 1
             f_o_src.write(graph + '\n')
             f_o_tar.write('a\n')
-    
+        row_info['end_row'] = row -1 
+     
     '''
     for table in table_lst:
         graph_lst = process_table(table)
     '''
-
     f_o_src.close()
     f_o_tar.close()
+    f_o_tables.close()
+     
+    out_map_file = os.path.join('output', 'table_row_map.json')
+    with open(out_map_file, 'w') as f_o:
+        for table_id in table_id_dict:
+            map_info = {
+                'table_id':table_id,
+                'start_row':table_id_dict[table_id]['start_row'],
+                'end_row':table_id_dict[table_id]['end_row']
+            }
+            f_o.write(json.dumps(map_info) + '\n')
+    print('row=%d' % row)
     
 def gen_graph(row_info, url):
     N = len(row_info)
