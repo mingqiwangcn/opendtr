@@ -1,6 +1,6 @@
-nq_data_dir=~/data/nq
+nq_data_dir=~/data/nq_tables
 max_seq_length=512
-retrieval_model_name="./models/tapas_nq_hn_retriever_large"
+retrieval_model_name="tapas_dual_encoder_proj_256_medium"
 python3 tapas/retrieval/create_retrieval_data_main.py \
   --input_interactions_dir="${nq_data_dir}/interactions" \
   --input_tables_dir=${nq_data_dir}/tables \
