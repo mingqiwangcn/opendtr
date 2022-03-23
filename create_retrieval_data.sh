@@ -1,4 +1,9 @@
-nq_data_dir=~/data/nq_tables
+if [ "$#" -ne 1 ]; then
+  echo "Usage: ./create_retrieval_data.sh <dataset>"
+  exit
+fi
+dataset=$1
+nq_data_dir=~/data/${dataset}
 max_seq_length=512
 retrieval_model_name="tapas_dual_encoder_proj_256_medium"
 python3 tapas/retrieval/create_retrieval_data_main.py \
