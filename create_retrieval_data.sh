@@ -3,13 +3,13 @@ if [ "$#" -ne 1 ]; then
   exit
 fi
 dataset=$1
-nq_data_dir=~/data/${dataset}
+data_dir=~/data/${dataset}
 max_seq_length=512
 retrieval_model_name="tapas_dual_encoder_proj_256_medium"
-python3 tapas/retrieval/create_retrieval_data_main.py \
-  --input_interactions_dir="${nq_data_dir}/interactions" \
-  --input_tables_dir=${nq_data_dir}/tables \
-  --output_dir="${nq_data_dir}/tf_examples" \
+python tapas/retrieval/create_retrieval_data_main.py \
+  --input_interactions_dir="${data_dir}/interactions" \
+  --input_tables_dir=${data_dir}/tables \
+  --output_dir="${data_dir}/tf_examples" \
   --vocab_file="${retrieval_model_name}/vocab.txt" \
   --max_seq_length="${max_seq_length}" \
   --max_column_id="${max_seq_length}" \
