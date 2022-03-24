@@ -56,11 +56,12 @@ def write_to_tensorboard(
     logdir,
 ):
   """Writes metrics to tensorbaord."""
-  with tf.summary.FileWriter(logdir) as writer:
-    for label, value in metrics.items():
-      summary = tf.Summary(
-          value=[tf.Summary.Value(tag=label, simple_value=value)])
-      writer.add_summary(summary, global_step)
+  with tf.compat.v1.Graph().as_default():
+      with tf.summary.FileWriter(logdir) as writer:
+        for label, value in metrics.items():
+          summary = tf.Summary(
+              value=[tf.Summary.Value(tag=label, simple_value=value)])
+          writer.add_summary(summary, global_step)
 
 
 def read_data_examples_from_interactions(
