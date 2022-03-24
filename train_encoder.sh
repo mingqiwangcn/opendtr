@@ -7,7 +7,7 @@ dataset=$1
 data_dir=~/data/${dataset}
 retrieval_model_name=tapas_dual_encoder_proj_256_medium
 max_seq_length=512
-model_dir=./models/fetaqa
+model_dir=./models/${dataset}
 python tapas/experiments/table_retriever_experiment.py \
    --do_train \
    --keep_checkpoint_max=40 \
