@@ -287,6 +287,8 @@ def main(_):
         total_steps=total_steps,
         marker_file_prefix=marker_file_prefix,
         single_step=single_step):
+        
+      tf.logging.info("use step(%d) checkpoint(%s)" % (current_step, checkpoint))
       if predict_input_fn is not None:
         _predict_and_export_metrics(
             mode="predict",
