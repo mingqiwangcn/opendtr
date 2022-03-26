@@ -1,0 +1,2 @@
+Need to install
+libcudnn7_7.6.3.30-1+cuda10.1_amd64.deb
