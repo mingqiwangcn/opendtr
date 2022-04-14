@@ -1,0 +1,19 @@
+1) Create training data by
+    ./create_retrieval_data.sh or
+    ./create_retrieval_data_syt.sh
+
+2) Train a dual encoder by
+    ./train_encoder.sh or
+    ./train_encoder_syt.sh
+
+3) Evaulate by
+    ./eval_checkpoints.sh or
+    ./eval_checkpoints_syt.sh
+
+4) Encode test and table data by
+    ./encode_tables.sh or
+    ./encode_tables_st.sh
+
+5) Predict by
+    ./retrieve_table.sh or
+    ./retrieve_table_syt.sh    
