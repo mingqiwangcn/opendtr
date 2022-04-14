@@ -18,7 +18,7 @@ def read_tables(table_file):
 
 def main():
     args = get_args()
-    output_dir = '/home/cc/data/%s/syt_interactions' % args.dataset
+    output_dir = '/home/cc/data/%s/syt_%s_interactions' % (args.dataset, args.sql_expr)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
@@ -31,7 +31,7 @@ def main():
     table_dict = read_tables(table_file)
 
     fusion_dir = '/home/cc/code/open_table_discovery/table2question/dataset/'
-    fusion_file = os.path.join(fusion_dir, args.dataset, 'auto_sql', 
+    fusion_file = os.path.join(fusion_dir, args.dataset, args.sql_expr, 
                                args.expr, 'fusion_retrieved_%s.jsonl' % args.mode) 
     
     rd_writer = tf.io.TFRecordWriter(output_file)
@@ -66,6 +66,7 @@ def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, required=True)
     parser.add_argument('--expr', type=str, required=True)
+    parser.add_argument('--sql_expr', type=str, required=True)
     parser.add_argument('--mode', type=str, required=True)
     args = parser.parse_args()
     return args
