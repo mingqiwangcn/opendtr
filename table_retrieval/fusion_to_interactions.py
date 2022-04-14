@@ -49,19 +49,15 @@ def create_nq_json(fusion_file, table_dict):
             nq_item = {}
             nq_item['id'] = str(fusion_item['id'])
             gold_table_id_lst = fusion_item['table_id_lst']
-            assert(len(gold_table_id_lst) == 1)
-            gold_table_id = gold_table_id_lst[0]
-            nq_item['table'] = table_dict[gold_table_id] 
-            
-            nq_q_info = {}
-            nq_q_info['id'] = nq_item['id'] + '_0'
-            nq_q_info['originalText'] = fusion_item['question']
-            nq_q_info['answer'] = {'answerTexts':fusion_item['answers']}
-            nq_item['questions'] = [nq_q_info]
-        
-            yield nq_item 
+            for idx, gold_table_id in enumerate(gold_table_id_lst):
+                nq_item['table'] = table_dict[gold_table_id] 
+                nq_q_info = {}
+                nq_q_info['id'] = nq_item['id'] + '_%d' % idx
+                nq_q_info['originalText'] = fusion_item['question']
+                nq_q_info['answer'] = {'answerTexts':fusion_item['answers']}
+                nq_item['questions'] = [nq_q_info]
+                yield nq_item 
  
-
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, required=True)
