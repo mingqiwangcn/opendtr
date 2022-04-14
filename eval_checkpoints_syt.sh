@@ -1,10 +1,11 @@
-if [ "$#" -ne 1 ]; then
-  echo "Usage: ./eval_checkpoints.sh <dataset>"
+if [ "$#" -ne 2 ]; then
+  echo "Usage: ./eval_checkpoints.sh <dataset> <sql_expr>"
   exit
 fi
 
 dataset=$1
-model_dir=models/${dataset}_syt
+sql_expr=$2
+model_dir=models/${dataset}_syt_${sql_expr}
 data_dir=~/data/${dataset}
 retrieval_model_name=tapas_dual_encoder_proj_256_medium
 max_seq_length=512
@@ -12,7 +13,7 @@ max_seq_length=512
 python3 tapas/experiments/table_retriever_experiment.py \
    --do_predict \
    --model_dir="${model_dir}" \
-   --input_file_eval="${data_dir}/syt_tf_examples/syt_dev.tfrecord" \
+   --input_file_eval="${data_dir}/syt_${sql_expr}_tf_examples/syt_dev.tfrecord" \
    --bert_config_file="${retrieval_model_name}/bert_config.json" \
    --init_from_single_encoder=false \
    --down_projection_dim=256 \

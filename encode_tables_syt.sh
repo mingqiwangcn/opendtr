@@ -1,13 +1,14 @@
-if [ "$#" -ne 2 ]; then
-  echo "Usage: ./encode_tables_syt.sh <dataset> <checkpoint_step>"
+if [ "$#" -ne 3 ]; then
+  echo "Usage: ./encode_tables_syt.sh <dataset> <sql_expr> <checkpoint_step>"
   exit
 fi
 
 dataset=$1
-step=$2
+sql_expr=$2
+step=$3
 data_dir=~/data/${dataset}
 max_seq_length=512
-model_dir=models/${dataset}_syt
+model_dir=models/${dataset}_syt_${sql_expr}
 retrieval_model_name=tapas_dual_encoder_proj_256_medium
 for mode in test tables; do
   echo "encoding ${mode}"
@@ -15,7 +16,7 @@ for mode in test tables; do
      --do_predict \
      --model_dir="${model_dir}" \
      --prediction_output_dir="${model_dir}/${mode}_${step}" \
-     --input_file_predict="${data_dir}/syt_tf_examples/${mode}.tfrecord" \
+     --input_file_predict="${data_dir}/syt_${sql_expr}_tf_examples/${mode}.tfrecord" \
      --bert_config_file="${retrieval_model_name}/bert_config.json" \
      --init_from_single_encoder=false \
      --down_projection_dim=256 \
