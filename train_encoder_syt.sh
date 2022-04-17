@@ -18,7 +18,7 @@ python tapas/experiments/table_retriever_experiment.py \
    --init_checkpoint="${retrieval_model_name}/model.ckpt" \
    --init_from_single_encoder=false \
    --down_projection_dim=256 \
-   --num_train_examples=1920000 \
+   --num_train_examples=960000 \
    --learning_rate=1.25e-5 \
    --train_batch_size=32 \
    --warmup_ratio=0.01 \
