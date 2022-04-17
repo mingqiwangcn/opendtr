@@ -21,7 +21,6 @@ def main():
     output_dir = '/home/cc/data/%s/syt_%s_interactions' % (args.dataset, args.sql_expr)
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-
     output_file = os.path.join(output_dir, 'syt_%s.tfrecord' % args.mode)
     if os.path.exists(output_file):
         print('output file (%s) already exists.' % output_file)
@@ -29,17 +28,14 @@ def main():
     
     table_file = os.path.join('/home/cc/data', args.dataset, 'tables/tables.jsonl')
     table_dict = read_tables(table_file)
-
     fusion_dir = '/home/cc/code/open_table_discovery/table2question/dataset/'
     fusion_file = os.path.join(fusion_dir, args.dataset, args.sql_expr, 
                                args.expr, 'fusion_retrieved_%s.jsonl' % args.mode) 
-    
     rd_writer = tf.io.TFRecordWriter(output_file)
     for nq_item in tqdm(create_nq_json(fusion_file, table_dict)):
         itr_data = interaction_pb2.Interaction()
         protobuf.json_format.ParseDict(nq_item, itr_data)
         rd_writer.write(itr_data.SerializeToString())
-
     rd_writer.close()
 
 def create_nq_json(fusion_file, table_dict):
@@ -49,10 +45,10 @@ def create_nq_json(fusion_file, table_dict):
             nq_item = {}
             nq_item['id'] = str(fusion_item['id'])
             gold_table_id_lst = fusion_item['table_id_lst']
-            for idx, gold_table_id in enumerate(gold_table_id_lst):
+            for gold_table_id in gold_table_id_lst:
                 nq_item['table'] = table_dict[gold_table_id] 
                 nq_q_info = {}
-                nq_q_info['id'] = nq_item['id'] + '_%d' % idx
+                nq_q_info['id'] = nq_item['id'] + '_0' # use same item and question id if multiple tables are correct.
                 nq_q_info['originalText'] = fusion_item['question']
                 nq_q_info['answer'] = {'answerTexts':fusion_item['answers']}
                 nq_item['questions'] = [nq_q_info]
