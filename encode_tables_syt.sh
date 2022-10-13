@@ -6,7 +6,7 @@ fi
 dataset=$1
 sql_expr=$2
 step=$3
-data_dir=~/data/${dataset}
+data_dir=~/code/data/${dataset}
 max_seq_length=512
 model_dir=models/${dataset}_syt_${sql_expr}
 retrieval_model_name=tapas_dual_encoder_proj_256_medium
@@ -16,7 +16,7 @@ for mode in test tables; do
      --do_predict \
      --model_dir="${model_dir}" \
      --prediction_output_dir="${model_dir}/${mode}_${step}" \
-     --input_file_predict="${data_dir}/syt_${sql_expr}_tf_examples/${mode}.tfrecord" \
+     --input_file_predict="${data_dir}/tf_examples/${mode}.tfrecord" \
      --bert_config_file="${retrieval_model_name}/bert_config.json" \
      --init_from_single_encoder=false \
      --down_projection_dim=256 \
