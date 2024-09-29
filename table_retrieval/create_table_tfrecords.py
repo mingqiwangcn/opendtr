@@ -32,7 +32,7 @@ def table_item_2_nq_table(table_item):
         
 def main():
     args = get_args()
-    out_dir = f'./output/{args.dataset}/tables'
+    out_dir = f'/home/cc/data/{args.dataset}/tables'
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
     out_file_name = f'{args.dataset}_tables.tfrecord'
