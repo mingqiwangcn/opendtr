@@ -1,16 +1,15 @@
-if [ "$#" -ne 4 ]; then
-  echo "Usage: ./fusion2inters.sh <dataset> <expr> <sql_expr> <mode>"
+if [ "$#" -ne 5 ]; then
+  echo "Usage: ./fusion2inters.sh <dataset> <syt> <expr> <sql_expr> <mode>"
   exit
 fi
-
 dataset=$1
-expr=$2
-sql_expr=$3
-mode=$4
-
-python ./fusion_to_interactions.py \
+syt=$2
+expr=$3
+sql_expr=$4
+mode=$5
+python ./create_interactions.py \
     --dataset ${dataset} \
+    --syt ${syt} \
     --expr ${expr} \
     --sql_expr ${sql_expr} \
     --mode ${mode}
-
