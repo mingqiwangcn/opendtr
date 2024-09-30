@@ -1,2 +1,4 @@
 Need to install
-libcudnn7_7.6.3.30-1+cuda10.1_amd64.deb
+1) cuda_10.1.243_418.87.00_linux.run
+2) Remove completely other cuda
+3) libcudnn7_7.6.3.30-1+cuda10.1_amd64.deb
