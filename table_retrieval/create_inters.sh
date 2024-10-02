@@ -1,5 +1,5 @@
 if [ "$#" -ne 5 ]; then
-  echo "Usage: ./fusion2inters.sh <dataset> <syt> <expr> <sql_expr> <mode>"
+  echo "Usage: ./create_inters.sh <dataset> <syt> <expr> <sql_expr> <mode>"
   exit
 fi
 dataset=$1

@@ -5,7 +5,8 @@ import json
 from tqdm import tqdm
 import argparse
 import uuid
-from google import protobuf 
+from google import protobuf
+import random
 
 def read_tables(table_file):
     table_dict = {}
@@ -14,7 +15,15 @@ def read_tables(table_file):
             item = json.loads(line)
             table_id = item['tableId']
             table_dict[table_id] = item
-    return table_dict 
+    return table_dict
+
+def load_annotated_query(table_file):
+    q_dict = {}
+    with open(table_file) as f:
+        for line in f:
+            query = json.loads(line)
+            q_dict[query['id']] = query
+    return q_dict
 
 def get_out_dir(args):
     if args.syt:
@@ -52,24 +61,45 @@ def main():
         print('output file (%s) already exists.' % output_file)
         return
     
+    annotated_query_file = os.path.join('/home/cc/data', args.dataset, 
+                                        f'query/{args.dataset}_questions_annotated.jsonl')
+    q_dict = load_annotated_query(annotated_query_file)
     table_file = os.path.join('/home/cc/data', args.dataset, 'tables/tables.jsonl')
     table_dict = read_tables(table_file)
     input_file = get_input_file(args)
     rd_writer = tf.io.TFRecordWriter(output_file)
-    for nq_item in tqdm(create_nq_json(input_file, table_dict)):
+    is_train = (args.mode == 'train')
+    for nq_item in tqdm(create_nq_json(is_train, input_file, table_dict, q_dict)):
         itr_data = interaction_pb2.Interaction()
         protobuf.json_format.ParseDict(nq_item, itr_data)
         rd_writer.write(itr_data.SerializeToString())
     rd_writer.close()
 
-def create_nq_json(input_file, table_dict):
+def sample_answer_tables(query_item, q_dict):
+    answer_tables = query_item['table_id_lst']
+    src_table = q_dict[query_item['id']]['meta']['table_id']
+    assert src_table in answer_tables
+    other_tables = [a for a in answer_tables if a != src_table]
+    other_sample_tables = []
+    if len(other_tables) > 0:
+        M = min(2, len(other_tables))
+        other_sample_tables = random.sample(other_tables, M)
+    
+    ret_tables = [src_table] + other_sample_tables
+    return ret_tables
+
+def create_nq_json(is_train, input_file, table_dict, q_dict):
     with open(input_file) as f:
         for line in f:
             query_item = json.loads(line)
             nq_item = {}
             nq_item['id'] = str(query_item['id'])
-            gold_table_id_lst = query_item['table_id_lst']
-            for gold_table_id in gold_table_id_lst:
+            answer_table_lst = None
+            if is_train:
+                answer_table_lst = sample_answer_tables(query_item,  q_dict)
+            else:
+                answer_table_lst = query_item['table_id_lst']
+            for gold_table_id in answer_table_lst:
                 nq_item['table'] = table_dict[gold_table_id] 
                 nq_q_info = {}
                 nq_q_info['id'] = nq_item['id'] + '_0' # use same item and question id if multiple tables are correct.
