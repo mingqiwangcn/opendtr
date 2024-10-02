@@ -57,8 +57,8 @@ class InnerProductNearestNeighbors:
     # <float>[num_queries, num_candidates]
     distances = np.matmul(queries, self._candidates.T)
     # <int>[num_queries, n_neighbors]
-    indices = np.argpartition(distances,
-                              -self._n_neighbors)[:, -self._n_neighbors:]
+    num_neigh = min(distances.shape[1], self._n_neighbors)
+    indices = np.argpartition(distances, -num_neigh)[:, -num_neigh:]
     # This indices aren't sorted so we find the permutation to sort them.
     # <int>[num_queries, n_neighbors]
     permutation = np.argsort(-np.take_along_axis(distances, indices, axis=-1))
